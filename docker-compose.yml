@@ -1,0 +1,9 @@
+version: "3.7"
+
+services:
+  schpincer-monitoring:
+    build: ./
+    image: schpincer-monitoring:latest
+    volumes:
+      - ./sent.db:/app/sent.db
+    env_file: params.env

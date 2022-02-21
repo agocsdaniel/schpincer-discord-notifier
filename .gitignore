@@ -1,0 +1,4 @@
+params.env
+sent.db
+venv/*
+.idea/*
