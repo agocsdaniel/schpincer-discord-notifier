@@ -7,6 +7,19 @@ import requests
 import sqlite3
 from discord_webhook import DiscordWebhook, DiscordEmbed
 
+
+def get_cute_animal():
+    from lxml import html
+    import requests
+    page = requests.get('http://animalemails.com/')
+    tree = html.fromstring(page.content)
+    for img in tree.xpath("//img[@class='img-responsive']/@src"):
+        response = requests.get(img)
+        if response.status_code == 200:  # some pics are broken
+            return img
+    return get_cute_animal()  # recursion if all pics are broken :(
+
+
 API_URL = 'https://schpincer.sch.bme.hu/api/open/upcoming-openings?token=%s'
 
 # [
@@ -50,6 +63,19 @@ colors = {
     'yellow': 0xf4cf3b,
 }
 
+
+simple_template = '''{
+  "content": "FYI, @here",
+  "embeds": [
+    {
+      "title": "%(feeling)s",
+      "description": "%(comment)s",
+      "image": {
+        "url": "%(pr_url)s"
+      }
+    }
+  ]
+}'''
 template = '''{
   "content": "FYI, @here",
   "embeds": [
@@ -99,20 +125,27 @@ while True:
     for opening in openings:
         if not cur.execute("select * from sent where id=:id", {"id": opening['openingStart']}).fetchone() and \
                 (datetime.datetime.fromtimestamp(opening['orderStart']/1000) - datetime.datetime.now()).total_seconds() < 3600:
-            content = template % {
-                "feeling": opening['feeling'] or 'Új nyitást írtak ki',
-                "comment": opening['comment'],
-                'pr_url': opening['banner'],
-                "circle_logo_url": opening['icon'],
-                "circle_name": opening['name'],
-                "provider_link": opening['circleUrl'],
-                "start_of_opening": str(datetime.datetime.fromtimestamp(opening['openingStart']/1000)),
-                "start_of_order": str(datetime.datetime.fromtimestamp(opening['orderStart']/1000)),
-                'start_of_order_iso': str(datetime.datetime.utcfromtimestamp(opening['orderStart']/1000).isoformat()) + '.000Z',
-                'max_orders': opening['outOf'],
-                'color': colors[opening['circleColor']]
-            }
-            print(content)
+            if opening['name'] == 'Vödör' or 'vodor' in opening['circleUrl']:
+                content = simple_template % {
+                    "feeling": 'Mai cuki állatos kép',
+                    "comment": 'Töltődj fel hétfőre ezzel a cuki állatos képpel!',
+                    'pr_url': get_cute_animal()
+                }
+            else:
+                content = template % {
+                    "feeling": opening['feeling'] or 'Új nyitást írtak ki',
+                    "comment": opening['comment'],
+                    'pr_url': opening['banner'],
+                    "circle_logo_url": opening['icon'],
+                    "circle_name": opening['name'],
+                    "provider_link": opening['circleUrl'],
+                    "start_of_opening": str(datetime.datetime.fromtimestamp(opening['openingStart']/1000)),
+                    "start_of_order": str(datetime.datetime.fromtimestamp(opening['orderStart']/1000)),
+                    'start_of_order_iso': str(datetime.datetime.utcfromtimestamp(opening['orderStart']/1000).isoformat()) + '.000Z',
+                    'max_orders': opening['outOf'],
+                    'color': colors[opening['circleColor']]
+                }
+            print(content, flush=True)
             resp = requests.post(os.environ['WEBHOOK_URL'], data=content.encode('utf-8'), headers={'Content-Type': 'application/json'})
             print(resp.content)
             cur.execute("insert into sent values (:id)", {"id": opening['openingStart']})
