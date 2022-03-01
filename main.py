@@ -47,6 +47,7 @@ colors = {
     'purple2': 0x6d1878,
     'blue': 0x0271d1,
     'yellow': 0xf4cf3b,
+    'white': 0xffffff,
 }
 
 
@@ -123,7 +124,13 @@ def get_cute_animal(depth=10):
 
 
 while True:
-    openings = requests.get(API_URL % os.environ['SCHPINCER_TOKEN']).json()
+    try:
+        openings = requests.get(API_URL % os.environ['SCHPINCER_TOKEN']).json()
+    except:
+        print('Problem while fetching pincer api')
+        time.sleep(300)
+        continue
+
     for opening in openings:
         if not cur.execute("select * from sent where id=:id", {"id": opening['openingStart']}).fetchone() and \
                 (datetime.datetime.fromtimestamp(opening['orderStart']/1000) - datetime.datetime.now()).total_seconds() < 3600:
@@ -145,7 +152,7 @@ while True:
                     "start_of_order": str(datetime.datetime.fromtimestamp(opening['orderStart']/1000)),
                     'start_of_order_iso': str(datetime.datetime.utcfromtimestamp(opening['orderStart']/1000).isoformat()) + '.000Z',
                     'max_orders': opening['outOf'],
-                    'color': colors[opening['circleColor']]
+                    'color': colors.get(opening['circleColor']) or colors['white']
                 }
             print(content, flush=True)
             resp = requests.post(os.environ['WEBHOOK_URL'], data=content.encode('utf-8'), headers={'Content-Type': 'application/json'})
