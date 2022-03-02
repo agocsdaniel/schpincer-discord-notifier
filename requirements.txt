@@ -1,3 +1,2 @@
-discord-webhook
 requests~=2.27.1
 lxml
