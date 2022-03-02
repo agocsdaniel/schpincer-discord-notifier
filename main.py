@@ -4,6 +4,7 @@ import time
 import requests
 import sqlite3
 from lxml import html
+import logging
 
 
 API_URL = 'https://schpincer.sch.bme.hu/api/open/upcoming-openings?token=%s'
@@ -39,6 +40,7 @@ API_URL = 'https://schpincer.sch.bme.hu/api/open/upcoming-openings?token=%s'
 #   }
 # ]
 
+logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.DEBUG)
 
 colors = {
     'red': 0xcc0202,
@@ -127,7 +129,7 @@ while True:
     try:
         openings = requests.get(API_URL % os.environ['SCHPINCER_TOKEN']).json()
     except:
-        print('Problem while fetching pincer api')
+        logging.error('Problem while fetching pincer api')
         time.sleep(300)
         continue
 
@@ -154,9 +156,9 @@ while True:
                     'max_orders': opening['outOf'],
                     'color': colors.get(opening['circleColor']) or colors['white']
                 }
-            print(content, flush=True)
+            logging.debug(content)
             resp = requests.post(os.environ['WEBHOOK_URL'], data=content.encode('utf-8'), headers={'Content-Type': 'application/json'})
-            print(resp.content)
+            logging.debug(resp.content)
             cur.execute("insert into sent values (:id)", {"id": opening['openingStart']})
             con.commit()
     time.sleep(60)
