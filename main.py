@@ -100,14 +100,14 @@ while True:
         if opening['orderable'] and not cur.execute("select * from sent where id=:id", {"id": opening['openingStart']}).fetchone():
             if opening['name'] == 'Vödör' or 'vodor' in opening['circleUrl']:
                 content = simple_template % {
-                    'message': "FYI, @&" + os.environ['MENTIONED_ROLE'],
+                    'message': "FYI, <@&" + os.environ['MENTIONED_ROLE'] + ">",
                     "feeling": 'Mai cuki állatos kép',
                     "comment": 'Töltődj fel hétfőre ezzel a cuki állatos képpel!',
                     'pr_url': get_cute_animal()
                 }
             else:
                 content = template % {
-                    'message': "FYI, @&" + os.environ['MENTIONED_ROLE'],
+                    'message': "FYI, <@&" + os.environ['MENTIONED_ROLE'] + ">",
                     "feeling": opening['feeling'] or 'Új nyitást írtak ki',
                     "circle_name": opening['name'],
                     "provider_link": opening['circleUrl'],
