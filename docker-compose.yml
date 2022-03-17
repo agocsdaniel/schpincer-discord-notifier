@@ -5,5 +5,5 @@ services:
     build: ./
     image: schpincer-monitoring:latest
     volumes:
-      - ./sent.db:/app/sent.db
+      - ./db:/app/db
     env_file: params.env

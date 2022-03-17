@@ -57,7 +57,7 @@ template = '''{
   ]
 }'''
 
-con = sqlite3.connect('sent.db')
+con = sqlite3.connect('db/sent.db')
 cur = con.cursor()
 cur.execute('''CREATE TABLE IF NOT EXISTS sent (id int)''')
 
