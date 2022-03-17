@@ -23,7 +23,7 @@ colors = {
 
 
 simple_template = '''{
-  "content": "%(message)",
+  "content": "%(message)s",
   "embeds": [
     {
       "title": "%(feeling)s",
@@ -36,7 +36,7 @@ simple_template = '''{
 }'''
 
 template = '''{
-  "content": "%(message)",
+  "content": "%(message)s",
   "embeds": [
     {
       "title": "%(feeling)s",
