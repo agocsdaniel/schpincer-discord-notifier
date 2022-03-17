@@ -83,7 +83,7 @@ while True:
         for tr in doc.find(class_='circles-table').find_all('tr'):
             openings.append({
                 'name': tr.find('a').contents[0],
-                'circleUrl': 'https://schpincer.sch.bme.hu/' + tr.find('a')['href'],
+                'circleUrl': 'https://schpincer.sch.bme.hu' + tr.find('a')['href'],
                 'circleColor': tr['class'][0],
                 'openingStart': int(datetime.datetime.strptime(tr.find(class_='date').contents[0], '%H:%M (%y-%m-%d)').timestamp())*1000,
                 'feeling': dict(enumerate(tr.find(class_='feeling').contents)).get(0)
