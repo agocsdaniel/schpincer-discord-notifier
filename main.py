@@ -1,7 +1,6 @@
 import datetime
 import os
 import time
-
 import requests
 import sqlite3
 from lxml import html
